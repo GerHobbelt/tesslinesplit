@@ -1,9 +1,34 @@
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
+#include <leptonica/pix_internal.h>
 #include <string>
-#include <libgen.h>
+//#include <libgen.h>
 
-int main(int argc, char *argv[]) {
+#include "monolithic_examples.h"
+
+
+static const char *basename(const char *p)
+{
+	const char *f = strrchr(p, '/');
+	if (f)
+		f++;
+	else
+		f = p;
+	p = f;
+	f = strrchr(p, '\\');
+	if (f)
+		f++;
+	else
+		f = p;
+	return f;
+}
+
+
+#if defined(BUILD_MONOLITHIC)
+#define main tesslinesplit_ocular_main
+#endif
+
+int main(int argc, const char **argv) {
   if((argc != 3) && (argc != 4)) { printf("USAGE: %s imagefile outputdir [lang]\n", argv[0]); return 1; }
 
   std::string input_filename = std::string(argv[1]);
@@ -13,10 +38,10 @@ int main(int argc, char *argv[]) {
 
   tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
   if (argc == 4) {
-    api->Init(NULL, argv[3]);
+    api->InitSimple(NULL, argv[3]);
   }
   else {
-    api->Init(NULL, "eng");
+    api->InitSimple(NULL, "eng");
   }
   Pix *image0 = pixRead(input_filename.c_str());
   api->SetImage(image0);
